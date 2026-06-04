@@ -18,4 +18,40 @@ app.MapGet("/api/holidays", async (HolidayCatalogueStorageService storage) =>
     return Results.Ok(holidays);
 });
 
+app.MapGet("/images/{*fileName}", (string fileName) =>
+{
+    if (string.IsNullOrWhiteSpace(fileName))
+    {
+        return Results.BadRequest("Missing image file name.");
+    }
+
+    string safeFileName = Path.GetFileName(Uri.UnescapeDataString(fileName));
+
+    string imagePath = Path.Combine(
+        HolidayExplorerPaths.AttractionImagesDirectory,
+        safeFileName);
+
+    if (!File.Exists(imagePath))
+    {
+        return Results.NotFound(new
+        {
+            message = "Image file was not found.",
+            requestedFile = safeFileName,
+            expectedFolder = HolidayExplorerPaths.AttractionImagesDirectory,
+            expectedPath = imagePath
+        });
+    }
+
+    string contentType = Path.GetExtension(imagePath).ToLowerInvariant() switch
+    {
+        ".png" => "image/png",
+        ".webp" => "image/webp",
+        ".jpg" => "image/jpeg",
+        ".jpeg" => "image/jpeg",
+        _ => "application/octet-stream"
+    };
+
+    return Results.File(imagePath, contentType);
+});
+
 app.Run();

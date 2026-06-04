@@ -66,6 +66,14 @@ function renderAttractions(attractions) {
 
         if (attraction.imagePath) {
             image.src = buildImageUrl(attraction.imagePath);
+
+            image.onerror = () => {
+                console.warn("Failed to load attraction image:", attraction.imagePath);
+                image.remove();
+            };
+        }
+        else {
+            image.remove();
         }
 
         const content = document.createElement("div");
@@ -108,10 +116,18 @@ function formatMoneyRange(range) {
 }
 
 function buildImageUrl(imagePath) {
+    if (!imagePath) {
+        return "";
+    }
+
     const fileName = imagePath
         .replaceAll("\\", "/")
         .split("/")
         .pop();
+
+    if (!fileName) {
+        return "";
+    }
 
     return `/images/${encodeURIComponent(fileName)}`;
 }
