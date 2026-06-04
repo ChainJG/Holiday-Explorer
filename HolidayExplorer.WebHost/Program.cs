@@ -4,6 +4,7 @@ using HolidayExplorer.Core.Services;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<HolidayCatalogueStorageService>();
+builder.Services.AddSingleton<AirportDatabaseService>();
 
 builder.WebHost.UseUrls("http://0.0.0.0:5050");
 
@@ -11,6 +12,13 @@ WebApplication app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.MapGet("/api/airports", async (AirportDatabaseService airportDatabase) =>
+{
+    var airports = await airportDatabase.LoadAirportsAsync();
+
+    return Results.Ok(airports);
+});
 
 app.MapGet("/api/holidays", async (HolidayCatalogueStorageService storage) =>
 {

@@ -1,6 +1,7 @@
 let holidayMap;
 let holidayMarkers = [];
 let attractionMarkers = [];
+let airportMarkers = [];
 let activeTravelRoute;
 let loadedHolidays = [];
 
@@ -29,6 +30,10 @@ function initialiseMap() {
 
     holidayMap.createPane("travel-routes");
     holidayMap.getPane("travel-routes").style.zIndex = 450;
+
+    holidayMap.createPane("airports");
+    holidayMap.getPane("airports").style.zIndex = 500;
+    holidayMap.getPane("airports").style.opacity = 0.4;
 
     holidayMap.createPane("attractions");
     holidayMap.getPane("attractions").style.zIndex = 650;
@@ -85,6 +90,39 @@ function loadHolidayMarkers(holidays) {
 
         holidayMarkers.push(marker);
     });
+}
+
+function loadAirportMarkers(airports) {
+    clearAirportMarkers();
+
+    if (!airports || airports.length === 0) {
+        return;
+    }
+
+    airports.forEach(airport => {
+        const airportIcon = L.divIcon({
+            className: "airport-marker",
+            html: `<div class="airport-pin">✈</div>`,
+            iconSize: [26, 26],
+            iconAnchor: [13, 13]
+        });
+
+        const marker = L.marker(
+            [airport.latitude, airport.longitude],
+            {
+                icon: airportIcon,
+                pane: "airports",
+                title: `${airport.name} (${airport.code})`
+            })
+            .addTo(holidayMap);
+
+        airportMarkers.push(marker);
+    });
+}
+
+function clearAirportMarkers() {
+    airportMarkers.forEach(marker => holidayMap.removeLayer(marker));
+    airportMarkers = [];
 }
 
 function selectHolidayById(holidayId) {

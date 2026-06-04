@@ -1,9 +1,13 @@
 let currentHoliday = null;
+let airports = [];
 
 async function startHolidayExplorer() {
+
     const holidays = await fetchHolidays();
+    airports = await fetchAirports();
 
     loadHolidayMarkers(holidays);
+    loadAirportMarkers(airports);
 
     window.addEventListener("holiday-selected", event => {
         currentHoliday = event.detail;
@@ -32,6 +36,16 @@ async function fetchHolidays() {
 
     if (!response.ok) {
         throw new Error("Failed to load holidays.");
+    }
+
+    return await response.json();
+}
+
+async function fetchAirports() {
+    const response = await fetch("/api/airports");
+
+    if (!response.ok) {
+        throw new Error("Failed to load airports.");
     }
 
     return await response.json();
@@ -124,10 +138,18 @@ function buildAttractionImageUrl(attraction) {
 }
 
 function openFlightSearch(holiday) {
-    const destinationCode = holiday.flightSearchCode || holiday.name.toLowerCase().replaceAll(" ", "-");
+    const originCode = "ema";
+    const destinationAirport = findBestAirportForHoliday(holiday);
+
+    if (!destinationAirport) {
+        alert("No airport could be found for this holiday.");
+        return;
+    }
+
+    const destinationCode = destinationAirport.code.toLowerCase();
 
     const outboundDate = new Date();
-    outboundDate.setMonth(outboundDate.getMonth() + 2);
+    outboundDate.setMonth(outboundDate.getMonth() + 1);
 
     const returnDate = new Date(outboundDate);
     returnDate.setDate(returnDate.getDate() + 7);
@@ -136,11 +158,63 @@ function openFlightSearch(holiday) {
     const inbound = formatSkyscannerDate(returnDate);
 
     const url =
-        `https://www.skyscanner.net/transport/flights/uk/${destinationCode}/${outbound}/${inbound}/` +
-        "?adultsv2=2&adults=2&cabinclass=economy&rtn=1&currency=GBP&locale=en-GB";
+        `https://www.skyscanner.net/transport/flights/${originCode}/${destinationCode}/${outbound}/${inbound}/` +
+        "?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1" +
+        "&outboundaltsenabled=false&inboundaltsenabled=false&preferdirects=false";
 
     window.open(url, "_blank", "noopener,noreferrer");
 }
+
+function findBestAirportForHoliday(holiday) {
+    const preferredCityAirport = airports.find(airport =>
+        airport.isPreferredForCity &&
+        normaliseText(airport.city) === normaliseText(holiday.name));
+
+    if (preferredCityAirport) {
+        return preferredCityAirport;
+    }
+
+    return airports
+        .map(airport => ({
+            airport,
+            distanceKm: calculateDistanceKm(
+                holiday.latitude,
+                holiday.longitude,
+                airport.latitude,
+                airport.longitude)
+        }))
+        .sort((a, b) => a.distanceKm - b.distanceKm)[0]?.airport ?? null;
+}
+
+function calculateDistanceKm(latitude1, longitude1, latitude2, longitude2) {
+    const earthRadiusKm = 6371;
+
+    const dLat = toRadians(latitude2 - latitude1);
+    const dLon = toRadians(longitude2 - longitude1);
+
+    const lat1 = toRadians(latitude1);
+    const lat2 = toRadians(latitude2);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadiusKm * c;
+}
+
+function toRadians(degrees) {
+    return degrees * Math.PI / 180;
+}
+
+function normaliseText(value) {
+    return value
+        .toLowerCase()
+        .trim();
+}
+
 
 function formatSkyscannerDate(date) {
     const year = String(date.getFullYear()).slice(2);

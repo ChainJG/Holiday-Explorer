@@ -16,7 +16,7 @@ namespace HolidayExplorer.Core.Models
         public double Longitude { get; set; }
 
         public double Score { get; set; }
-
+        public string? FlightSearchCodeOverride { get; set; }
         public string FlightDuration { get; set; } = string.Empty;
 
         public string SummerTemperature { get; set; } = string.Empty;

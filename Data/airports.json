@@ -1,0 +1,83 @@
+[
+  {
+    "code": "EMA",
+    "name": "East Midlands Airport",
+    "city": "Derby",
+    "country": "United Kingdom",
+    "latitude": 52.8311,
+    "longitude": -1.3281,
+    "isPreferredForCity": true
+  },
+  {
+    "code": "BHX",
+    "name": "Birmingham Airport",
+    "city": "Birmingham",
+    "country": "United Kingdom",
+    "latitude": 52.4539,
+    "longitude": -1.7480,
+    "isPreferredForCity": false
+  },
+  {
+    "code": "MAN",
+    "name": "Manchester Airport",
+    "city": "Manchester",
+    "country": "United Kingdom",
+    "latitude": 53.3650,
+    "longitude": -2.2728,
+    "isPreferredForCity": false
+  },
+  {
+    "code": "BCN",
+    "name": "Barcelona El Prat Airport",
+    "city": "Barcelona",
+    "country": "Spain",
+    "latitude": 41.2974,
+    "longitude": 2.0833,
+    "isPreferredForCity": true
+  },
+  {
+    "code": "CDG",
+    "name": "Paris Charles de Gaulle Airport",
+    "city": "Paris",
+    "country": "France",
+    "latitude": 49.0097,
+    "longitude": 2.5479,
+    "isPreferredForCity": true
+  },
+  {
+    "code": "ORY",
+    "name": "Paris Orly Airport",
+    "city": "Paris",
+    "country": "France",
+    "latitude": 48.7233,
+    "longitude": 2.3794,
+    "isPreferredForCity": false
+  },
+  {
+    "code": "DXB",
+    "name": "Dubai International Airport",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "latitude": 25.2532,
+    "longitude": 55.3657,
+    "isPreferredForCity": true
+  },
+  {
+    "code": "FCO",
+    "name": "Rome Fiumicino Airport",
+    "city": "Rome",
+    "country": "Italy",
+    "latitude": 41.8003,
+    "longitude": 12.2389,
+    "isPreferredForCity": true
+  },
+  {
+    "code": "AMS",
+    "name": "Amsterdam Schiphol Airport",
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "latitude": 52.3105,
+    "longitude": 4.7683,
+    "isPreferredForCity": true
+  }
+]
