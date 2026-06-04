@@ -1,46 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <RootNamespace>Holiday_Explorer</RootNamespace>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<RootNamespace>Holiday_Explorer</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Assets\Map\map.css" />
-    <None Remove="Assets\Map\map.html" />
-    <None Remove="Assets\Map\map.js" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Assets\Map\map.css" />
+		<None Remove="Assets\Map\map.html" />
+		<None Remove="Assets\Map\map.js" />
+	</ItemGroup>
 
-  <ItemGroup>
-	<Content Include="Data\holidays.seed.json">
-	 <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
-    <Content Include="Assets\Map\map.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Map\map.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Map\map.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Data\holidays.seed.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 
-  <ItemGroup>
-    <Folder Include="Core\Interfaces\" />
-    <Folder Include="MVVM\UserControls\" />
-    <Folder Include="Features\" />
-    <Folder Include="Data\" />
-    <Folder Include="Shared\Helpers\" />
-  </ItemGroup>
+		<Content Include="Assets\Map\map.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 
-  <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
-  </ItemGroup>
+		<Content Include="Assets\Map\map.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<Content Include="Assets\Map\map.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="HolidayExplorer.Core\HolidayExplorer.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Core\Interfaces\" />
+		<Folder Include="HolidayExplorer.WebHost\wwwroot\" />
+		<Folder Include="Infrastructure\" />
+		<Folder Include="MVVM\UserControls\" />
+		<Folder Include="Features\" />
+		<Folder Include="Shared\Helpers\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="holidayexplorer.webhost\HolidayExplorer.WebHost.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
+	</ItemGroup>
 
 </Project>

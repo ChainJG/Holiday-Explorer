@@ -1,10 +1,10 @@
-﻿using Holiday_Explorer.Core.Models;
+﻿using HolidayExplorer.Core.Models;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
-namespace Holiday_Explorer.Core
+namespace HolidayExplorer.Core.Services
 {
     public sealed class HolidayCatalogueStorageService
     {

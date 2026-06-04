@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Holiday Explorer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+    <main class="app-shell">
+        <section class="map-panel">
+            <div id="map"></div>
+        </section>
+
+        <aside class="side-panel">
+            <p class="eyebrow">Holiday Explorer</p>
+            <h1 id="holidayName">Select a holiday</h1>
+            <p id="holidayCountry">Click a marker on the map.</p>
+
+            <div class="stats-grid">
+                <button class="stat-card" id="flightPriceCard">
+                    <span>Flights for 2</span>
+                    <strong id="flightPrice">—</strong>
+                </button>
+
+                <div class="stat-card">
+                    <span>Flight time</span>
+                    <strong id="flightDuration">—</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Temperature</span>
+                    <strong id="temperature">—</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Score</span>
+                    <strong id="score">—</strong>
+                </div>
+            </div>
+
+            <p id="verdict" class="verdict"></p>
+
+            <section class="hovered-attraction">
+                <p class="eyebrow">Hovered attraction</p>
+                <h2 id="hoveredAttractionName">None selected</h2>
+                <p id="hoveredAttractionDescription"></p>
+            </section>
+
+            <h2 class="section-title">Attractions</h2>
+            <div id="attractionList" class="attraction-list"></div>
+        </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="map.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

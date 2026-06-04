@@ -1,8 +1,8 @@
-﻿using Holiday_Explorer.Core;
-using Holiday_Explorer.Core.Models;
+﻿using HolidayExplorer.Core.Services;
 using Holiday_Explorer.MVVM.Core;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using HolidayExplorer.Core.Models;
 
 namespace Holiday_Explorer.MVVM.ViewModels
 {

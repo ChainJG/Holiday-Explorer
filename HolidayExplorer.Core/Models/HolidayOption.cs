@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using HolidayExplorer.Core.Models;
+using System.Collections.ObjectModel;
 
-namespace Holiday_Explorer.Core.Models
+namespace HolidayExplorer.Core.Models
 {
     public sealed class HolidayOption
     {

@@ -1,5 +1,5 @@
-﻿using Holiday_Explorer.Core;
-using Holiday_Explorer.Core.Models;
+﻿using HolidayExplorer.Core.Services;
+using HolidayExplorer.Core.Models;
 using Holiday_Explorer.MVVM.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using System.IO;
@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Holiday_Explorer.Core;
 
 namespace Holiday_Explorer.MVVM.Windows
 {

@@ -1,4 +1,4 @@
-﻿namespace Holiday_Explorer.Core.Models
+﻿namespace HolidayExplorer.Core.Models
 {
     public sealed class MoneyRange
     {

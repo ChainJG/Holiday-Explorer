@@ -1,10 +1,11 @@
-﻿using Holiday_Explorer.Core.Models;
-using Holiday_Explorer.Infrastructure.Http;
+﻿using Holiday_Explorer.HolidayExplorer.Core.Infrastructure.Http;
+using HolidayExplorer.Core.Models;
+using HolidayExplorer.Core.Services;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace Holiday_Explorer.Core
+namespace HolidayExplorer.Core.Services
 {
     public sealed class AttractionImageLookupService
     {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net.Http;
 
-namespace Holiday_Explorer.Core
+namespace HolidayExplorer.Core.Services
 {
     public sealed class AttractionImageStorageService
     {

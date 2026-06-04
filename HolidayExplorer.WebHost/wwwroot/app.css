@@ -1,0 +1,211 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: Bahnschrift, Segoe UI, Arial, sans-serif;
+    background: #18191f;
+    color: #ebebeb;
+}
+
+.app-shell {
+    display: grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(360px, 430px);
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    padding: 10px;
+}
+
+.map-panel {
+    overflow: hidden;
+    border-radius: 14px;
+    background: #121316;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.side-panel {
+    overflow-y: auto;
+    border-radius: 14px;
+    background: #121316;
+    padding: 18px;
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    font-size: 11px;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+h2 {
+    margin: 0;
+}
+
+#holidayCountry {
+    margin-top: 4px;
+    color: #a0a0a0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.stat-card {
+    border: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #ebebeb;
+    padding: 12px;
+    text-align: left;
+}
+
+    .stat-card span {
+        display: block;
+        color: #a0a0a0;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .stat-card strong {
+        font-size: 16px;
+    }
+
+button.stat-card {
+    cursor: pointer;
+}
+
+    button.stat-card:hover {
+        background: rgba(52, 152, 219, 0.22);
+    }
+
+.verdict {
+    margin: 16px 0 0;
+    color: #a0a0a0;
+    line-height: 1.4;
+}
+
+.hovered-attraction {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(52, 152, 219, 0.15);
+}
+
+    .hovered-attraction p:last-child {
+        color: #a0a0a0;
+        line-height: 1.4;
+    }
+
+.section-title {
+    margin-top: 22px;
+    font-size: 22px;
+}
+
+.attraction-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.attraction-card {
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+    .attraction-card img {
+        display: block;
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        background: #18191f;
+    }
+
+.attraction-card-content {
+    padding: 12px;
+}
+
+.attraction-card h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.attraction-card p {
+    margin: 6px 0 0;
+    color: #a0a0a0;
+    line-height: 1.4;
+}
+
+.starting-point-marker,
+.attraction-marker {
+    background: transparent;
+    border: none;
+}
+
+.starting-point-pin {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #2f80ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+.attraction-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid rgba(255, 213, 79, 0.95);
+    color: #ffd54f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+}
+
+.travel-time-tooltip {
+    background: rgba(15, 23, 42, 0.92);
+    color: #ffffff;
+    border: 1px solid rgba(147, 197, 253, 0.9);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+    .travel-time-tooltip::before {
+        display: none;
+    }
+
+@media (max-width: 900px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: 55vh auto;
+    }
+}
