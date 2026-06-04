@@ -10,6 +10,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Map\map.css" />
+    <None Remove="Assets\Map\map.html" />
+    <None Remove="Assets\Map\map.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Map\map.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Map\map.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Map\map.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Core\Interfaces\" />
     <Folder Include="MVVM\Core\" />
     <Folder Include="MVVM\UserControls\" />
@@ -20,6 +38,7 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:Holiday_Explorer"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="Holiday Explorer"
     Width="1025"
     Height="650"
@@ -22,8 +23,6 @@
             VerticalAlignment="Top"
             Background="{StaticResource PrimaryPanelColour}"
             UniformCornerRadius="10">
-
-
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -81,6 +80,13 @@
                     <!--#endregion-->
                 </Grid>
                 <!--#endregion-->
+
+
+                <Grid Grid.Row="1">
+
+                    <wv2:WebView2 x:Name="HolidayMapWebView" />
+
+                </Grid>
 
             </Grid>
         </materialDesign:Card>
