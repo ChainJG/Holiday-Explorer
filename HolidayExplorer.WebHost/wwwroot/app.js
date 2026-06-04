@@ -64,11 +64,11 @@ function renderAttractions(attractions) {
         const image = document.createElement("img");
         image.alt = attraction.name;
 
-        if (attraction.imagePath) {
-            image.src = buildImageUrl(attraction.imagePath);
+        if (attraction.hasImage || attraction.imagePath) {
+            image.src = buildAttractionImageUrl(attraction);
 
             image.onerror = () => {
-                console.warn("Failed to load attraction image:", attraction.imagePath);
+                console.warn("Failed to load attraction image:", attraction);
                 image.remove();
             };
         }
@@ -95,6 +95,10 @@ function renderAttractions(attractions) {
     });
 }
 
+function buildAttractionImageUrl(attraction) {
+    return `/api/attractions/${encodeURIComponent(attraction.id)}/image?v=${Date.now()}`;
+}
+
 function renderHoveredAttraction(attraction) {
     document.getElementById("hoveredAttractionName").textContent = attraction.name;
     document.getElementById("hoveredAttractionDescription").textContent = attraction.description;
@@ -115,21 +119,8 @@ function formatMoneyRange(range) {
     return `${symbol}${range.minimum}–${symbol}${range.maximum}`;
 }
 
-function buildImageUrl(imagePath) {
-    if (!imagePath) {
-        return "";
-    }
-
-    const fileName = imagePath
-        .replaceAll("\\", "/")
-        .split("/")
-        .pop();
-
-    if (!fileName) {
-        return "";
-    }
-
-    return `/images/${encodeURIComponent(fileName)}`;
+function buildAttractionImageUrl(attraction) {
+    return `/api/attractions/${encodeURIComponent(attraction.id)}/image?v=${Date.now()}`;
 }
 
 function openFlightSearch(holiday) {

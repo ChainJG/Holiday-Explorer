@@ -18,27 +18,44 @@ app.MapGet("/api/holidays", async (HolidayCatalogueStorageService storage) =>
     return Results.Ok(holidays);
 });
 
-app.MapGet("/images/{*fileName}", (string fileName) =>
+app.MapGet("/api/attractions/{attractionId}/image", async (
+    string attractionId,
+    HolidayCatalogueStorageService storage) =>
 {
-    if (string.IsNullOrWhiteSpace(fileName))
+    var holidays = await storage.LoadAsync();
+
+    var attraction = holidays
+        .SelectMany(holiday => holiday.Attractions)
+        .FirstOrDefault(item =>
+            string.Equals(item.Id, attractionId, StringComparison.OrdinalIgnoreCase));
+
+    if (attraction is null)
     {
-        return Results.BadRequest("Missing image file name.");
+        return Results.NotFound(new
+        {
+            message = "Attraction was not found.",
+            attractionId
+        });
     }
 
-    string safeFileName = Path.GetFileName(Uri.UnescapeDataString(fileName));
+    if (string.IsNullOrWhiteSpace(attraction.ImagePath))
+    {
+        return Results.NotFound(new
+        {
+            message = "Attraction does not have an image path.",
+            attractionId
+        });
+    }
 
-    string imagePath = Path.Combine(
-        HolidayExplorerPaths.AttractionImagesDirectory,
-        safeFileName);
+    string imagePath = attraction.ImagePath;
 
     if (!File.Exists(imagePath))
     {
         return Results.NotFound(new
         {
-            message = "Image file was not found.",
-            requestedFile = safeFileName,
-            expectedFolder = HolidayExplorerPaths.AttractionImagesDirectory,
-            expectedPath = imagePath
+            message = "Attraction image file was not found.",
+            attractionId,
+            imagePath
         });
     }
 
