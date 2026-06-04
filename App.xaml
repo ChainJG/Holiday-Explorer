@@ -1,0 +1,30 @@
+﻿<Application
+    x:Class="Holiday_Explorer.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Holiday_Explorer">
+    <Application.Resources>
+
+        <ResourceDictionary>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+
+                <ResourceDictionary Source="Styles/Core/ColourDictionary.xaml" />
+                <ResourceDictionary Source="Styles/Core/ConverterDictionary.xaml" />
+                <ResourceDictionary Source="Styles/TextBlock/TextStyles.xaml" />
+
+                <ResourceDictionary Source="Styles/Icons/PackIconStyles.xaml" />
+                <ResourceDictionary Source="Styles/CheckBox/CheckBoxStyle.xaml" />
+
+                <ResourceDictionary Source="Styles/Lines/VerticalSeparatorStyle.xaml" />
+                <ResourceDictionary Source="Styles/Buttons/TitleBar/TitleBarButtonStyle.xaml" />
+                <ResourceDictionary Source="Styles/Lines/IndeterminateProgressBarStyles.xaml" />
+                <ResourceDictionary Source="Styles/Border/TooltipStyle.xaml" />
+
+
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
