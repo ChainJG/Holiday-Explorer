@@ -1,4 +1,4 @@
-﻿using Holiday_Explorer.HolidayExplorer.Core.Infrastructure.Http;
+﻿using HolidayExplorer.Core.Infrastructure.Http;
 using HolidayExplorer.Core.Models;
 using HolidayExplorer.Core.Services;
 using System.IO;

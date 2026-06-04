@@ -10,6 +10,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="HolidayExplorer.Core\**\*.cs" />
+		<Compile Remove="HolidayExplorer.WebHost\**\*.cs" />
+
+		<EmbeddedResource Remove="HolidayExplorer.Core\**" />
+		<EmbeddedResource Remove="HolidayExplorer.WebHost\**" />
+
+		<None Remove="HolidayExplorer.Core\**" />
+		<None Remove="HolidayExplorer.WebHost\**" />
+
+		<Page Remove="HolidayExplorer.Core\**\*.xaml" />
+		<Page Remove="HolidayExplorer.WebHost\**\*.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Assets\Map\map.css" />
 		<None Remove="Assets\Map\map.html" />
 		<None Remove="Assets\Map\map.js" />
@@ -39,15 +53,10 @@
 
 	<ItemGroup>
 		<Folder Include="Core\Interfaces\" />
-		<Folder Include="HolidayExplorer.WebHost\wwwroot\" />
 		<Folder Include="Infrastructure\" />
 		<Folder Include="MVVM\UserControls\" />
 		<Folder Include="Features\" />
 		<Folder Include="Shared\Helpers\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="holidayexplorer.webhost\HolidayExplorer.WebHost.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

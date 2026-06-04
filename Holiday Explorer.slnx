@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="Holiday Explorer.csproj" />
+  <Project Path="HolidayExplorer.Core/HolidayExplorer.Core.csproj" />
+  <Project Path="HolidayExplorer.WebHost/HolidayExplorer.WebHost.csproj" />
 </Solution>
