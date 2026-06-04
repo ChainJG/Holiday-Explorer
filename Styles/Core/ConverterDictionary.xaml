@@ -6,5 +6,6 @@
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrueConverter" />
     <converters:ToolTipCenterOffsetConverter x:Key="ToolTipCenterOffsetConverter" />
     <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    <converters:ImagePathToImageSourceConverter x:Key="ImagePathToImageSourceConverter" />
 
 </ResourceDictionary>

@@ -29,9 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Core\Interfaces\" />
-    <Folder Include="MVVM\Core\" />
     <Folder Include="MVVM\UserControls\" />
-    <Folder Include="MVVM\ViewModels\" />
     <Folder Include="Features\" />
     <Folder Include="Shared\Helpers\" />
   </ItemGroup>

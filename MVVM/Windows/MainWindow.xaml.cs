@@ -1,9 +1,11 @@
 ﻿using Holiday_Explorer.Core;
+using Holiday_Explorer.Core.Models;
+using Holiday_Explorer.MVVM.ViewModels;
 using Microsoft.Web.WebView2.Core;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -12,34 +14,51 @@ namespace Holiday_Explorer.MVVM.Windows
 {
     public partial class MainWindow : Window
     {
-        #region Application Functions
+        private readonly MainWindowViewModel _viewModel = new();
+        private readonly AttractionImageStorageService _imageStorageService = new();
+
+        private bool _hasLoadedMap;
+
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWind, int wMsg, int wParam, int lParam);
-        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            WindowInteropHelper helper = new WindowInteropHelper(this);
-            SendMessage(helper.Handle, 161, 2, 0);
-        }
-
-        private void BtnMinimiseWindow_Click(object sender, RoutedEventArgs e) =>
-            this.WindowState = WindowState.Minimized;
-
-        private void BtnExitApplication_Click(object sender, RoutedEventArgs e) =>
-            HolidayExplorerServices.Shutdown();
-        #endregion
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Loaded += HolidayMapView_Loaded;
+            DataContext = _viewModel;
+            Loaded += MainWindow_Loaded;
         }
 
-        private async void HolidayMapView_Loaded(object sender, RoutedEventArgs e)
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            WindowInteropHelper helper = new(this);
+            SendMessage(helper.Handle, 161, 2, 0);
+        }
+
+        private void BtnMinimiseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void BtnExitApplication_Click(object sender, RoutedEventArgs e)
+        {
+            HolidayExplorerServices.Shutdown();
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_hasLoadedMap)
+            {
+                return;
+            }
+
+            _hasLoadedMap = true;
+
             await HolidayMapWebView.EnsureCoreWebView2Async();
 
             HolidayMapWebView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+            HolidayMapWebView.NavigationCompleted += HolidayMapWebView_NavigationCompleted;
 
             string mapPath = Path.Combine(
                 AppContext.BaseDirectory,
@@ -47,75 +66,160 @@ namespace Holiday_Explorer.MVVM.Windows
                 "Map",
                 "map.html");
 
-            HolidayMapWebView.Source = new Uri(mapPath);
-
-            HolidayMapWebView.NavigationCompleted += async (_, _) =>
+            if (!File.Exists(mapPath))
             {
-                await SendHolidayMarkersToMapAsync();
-            };
+                MessageBox.Show(
+                    $"Map file could not be found:{Environment.NewLine}{mapPath}",
+                    "Holiday Explorer",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            HolidayMapWebView.Source = new Uri(mapPath);
+        }
+
+        private async void HolidayMapWebView_NavigationCompleted(
+            object? sender,
+            CoreWebView2NavigationCompletedEventArgs e)
+        {
+            if (!e.IsSuccess)
+            {
+                MessageBox.Show(
+                    "The holiday map failed to load.",
+                    "Holiday Explorer",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            await SendHolidayMarkersToMapAsync();
         }
 
         private async Task SendHolidayMarkersToMapAsync()
         {
-            var holidays = new[]
+            JsonSerializerOptions options = new()
             {
-                new
-                {
-                    id = "barcelona",
-                    name = "Barcelona",
-                    country = "Spain",
-                    latitude = 41.3874,
-                    longitude = 2.1686,
-                    score = 9.0,
-                    flightDuration = "2h 20m"
-                },
-                new
-                {
-                    id = "paris",
-                    name = "Paris",
-                    country = "France",
-                    latitude = 48.8566,
-                    longitude = 2.3522,
-                    score = 8.5,
-                    flightDuration = "1h 20m"
-                },
-                new
-                {
-                    id = "dubai",
-                    name = "Dubai",
-                    country = "United Arab Emirates",
-                    latitude = 25.2048,
-                    longitude = 55.2708,
-                    score = 7.0,
-                    flightDuration = "7h"
-                }
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
             };
 
-            string json = JsonSerializer.Serialize(holidays);
-
+            string json = JsonSerializer.Serialize(_viewModel.Holidays, options);
             string script = $"loadHolidayMarkers({json});";
 
             await HolidayMapWebView.CoreWebView2.ExecuteScriptAsync(script);
         }
 
-        private void CoreWebView2_WebMessageReceived(
+        private async void CoreWebView2_WebMessageReceived(
             object? sender,
             CoreWebView2WebMessageReceivedEventArgs e)
         {
-            string json = e.WebMessageAsJson;
+            using JsonDocument document = JsonDocument.Parse(e.WebMessageAsJson);
 
-            using JsonDocument document = JsonDocument.Parse(json);
-
-            string? messageType = document.RootElement.GetProperty("type").GetString();
-
-            if (messageType != "holiday-selected")
+            if (!document.RootElement.TryGetProperty("type", out JsonElement typeElement))
             {
                 return;
             }
 
-            string? holidayId = document.RootElement.GetProperty("holidayId").GetString();
+            string? messageType = typeElement.GetString();
 
-            MessageBox.Show($"Selected holiday: {holidayId}");
+            switch (messageType)
+            {
+                case "holiday-selected":
+                    await HandleHolidaySelectedAsync(document);
+                    break;
+
+                case "attraction-hovered":
+                    HandleAttractionHovered(document);
+                    break;
+
+                case "attraction-hover-ended":
+                    _viewModel.HoveredAttraction = null;
+                    break;
+            }
+        }
+
+        private async Task HandleHolidaySelectedAsync(JsonDocument document)
+        {
+            if (!document.RootElement.TryGetProperty("holidayId", out JsonElement holidayIdElement))
+            {
+                return;
+            }
+
+            string? holidayId = holidayIdElement.GetString();
+
+            if (string.IsNullOrWhiteSpace(holidayId))
+            {
+                return;
+            }
+
+            _viewModel.SelectHoliday(holidayId);
+
+            string escapedHolidayId = JsonSerializer.Serialize(holidayId);
+            await HolidayMapWebView.CoreWebView2.ExecuteScriptAsync($"selectHolidayById({escapedHolidayId});");
+        }
+
+        private void HandleAttractionHovered(JsonDocument document)
+        {
+            if (!document.RootElement.TryGetProperty("attractionId", out JsonElement attractionIdElement))
+            {
+                return;
+            }
+
+            string? attractionId = attractionIdElement.GetString();
+
+            if (string.IsNullOrWhiteSpace(attractionId))
+            {
+                return;
+            }
+
+            _viewModel.HoverAttraction(attractionId);
+        }
+
+        private void AttractionImage_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
+
+            e.Handled = true;
+        }
+
+        private void AttractionImage_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is not FrameworkElement { Tag: AttractionOption attraction })
+            {
+                return;
+            }
+
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                return;
+            }
+
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            if (files.Length == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                attraction.ImagePath = _imageStorageService.SaveAttractionImage(
+                    files[0],
+                    attraction.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Unable to add attraction image",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
     }
 }

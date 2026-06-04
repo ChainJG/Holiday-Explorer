@@ -3,94 +3,268 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Holiday_Explorer"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="Holiday Explorer"
-    Width="1025"
-    Height="650"
+    Width="1200"
+    Height="760"
+    MinWidth="980"
+    MinHeight="620"
     AllowsTransparency="True"
     Background="Transparent"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
-    <Grid>
 
-        <materialDesign:Card
-            Width="1025"
-            Height="600"
-            VerticalAlignment="Top"
-            Background="{StaticResource PrimaryPanelColour}"
-            UniformCornerRadius="10">
+    <Border Background="{StaticResource PrimaryPanelColour}" CornerRadius="10">
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <!--#region Title Bar-->
-                <Grid
-                    Grid.Row="0"
-                    Background="{StaticResource SecondaryPanelColour}"
-                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="80" />
-                    </Grid.ColumnDefinitions>
+            <!--#region Title Bar-->
+            <Grid
+                Grid.Row="0"
+                Background="{StaticResource SecondaryPanelColour}"
+                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
 
-                    <!--#region GameBoost Logo-->
-                    <StackPanel
-                        Grid.Column="0"
-                        Margin="15,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="100" />
+                </Grid.ColumnDefinitions>
 
-                        <materialDesign:PackIcon Margin="0,0,5,0" Kind="Holiday" />
-                        <TextBlock Style="{StaticResource SubTitleStyle}" Text="Holiday Explorer" />
-                    </StackPanel>
-                    <!--#endregion-->
+                <StackPanel
+                    Grid.Column="0"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
 
-                    <Separator
-                        Grid.Column="1"
-                        Width="15"
-                        Height="1.5"
-                        Style="{StaticResource VerticalSeparatorStyle}" />
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="0,0,8,0"
+                        Foreground="{StaticResource IconKindColor}"
+                        Kind="Holiday" />
 
-                    <!--#region Application Buttons (Minimise, Exit)-->
-                    <StackPanel
-                        Grid.Column="2"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource ButtonTitleStyle}" Text="Holiday Explorer" />
+                </StackPanel>
 
-                        <Button
-                            Click="BtnMinimiseWindow_Click"
-                            Style="{StaticResource TitleBarButtonStyle}"
-                            Tag="WindowMinimize" />
+                <StackPanel
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
 
-                        <Button
-                            Click="BtnExitApplication_Click"
-                            Style="{StaticResource TitleBarButtonStyle}"
-                            Tag="WindowClose" />
-                    </StackPanel>
-                    <!--#endregion-->
-                </Grid>
-                <!--#endregion-->
+                    <Button
+                        Click="BtnMinimiseWindow_Click"
+                        Style="{StaticResource TitleBarButtonStyle}"
+                        Tag="WindowMinimize" />
 
-
-                <Grid Grid.Row="1">
-
-                    <wv2:WebView2 x:Name="HolidayMapWebView" />
-
-                </Grid>
-
+                    <Button
+                        Click="BtnExitApplication_Click"
+                        Style="{StaticResource TitleBarButtonStyle}"
+                        Tag="WindowClose" />
+                </StackPanel>
             </Grid>
-        </materialDesign:Card>
+            <!--#endregion-->
 
+            <!--  Content  -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="520" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition
+                        Width="430"
+                        MinWidth="360"
+                        MaxWidth="600" />
+                </Grid.ColumnDefinitions>
 
-    </Grid>
+                <Border
+                    Grid.Column="0"
+                    Margin="12"
+                    ClipToBounds="True"
+                    CornerRadius="12">
+                    <wv2:WebView2 x:Name="HolidayMapWebView" />
+                </Border>
+
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="6"
+                    HorizontalAlignment="Stretch"
+                    Background="{StaticResource SecondaryPanelColour}"
+                    Opacity=".2" />
+
+                <Border
+                    Grid.Column="2"
+                    Margin="0,10,10,10"
+                    Padding="10"
+                    Background="{StaticResource SecondaryPanelColour}"
+                    CornerRadius="8">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource TitleStyle}"
+                                Text="{Binding SelectedHoliday.Name, FallbackValue='Holiday Name'}" />
+
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource SubTitleStyle}"
+                                Text="{Binding SelectedHoliday.Country, FallbackValue='Country'}" />
+
+                            <Border
+                                Margin="0,15,0,0"
+                                Padding="15"
+                                Background="{StaticResource ButtonBackground}"
+                                CornerRadius="10">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Style="{StaticResource ButtonSubTitleStyle}"
+                                            Text="Flights for 2" />
+                                        <TextBlock
+                                            Margin="0,4,0,0"
+                                            HorizontalAlignment="Left"
+                                            Style="{StaticResource ButtonTitleStyle}"
+                                            Text="{Binding SelectedHoliday.EstimatedFlightPriceForTwo.DisplayText, FallbackValue='£00-£000'}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Style="{StaticResource ButtonSubTitleStyle}"
+                                            Text="Flight time" />
+                                        <TextBlock
+                                            Margin="0,4,0,0"
+                                            HorizontalAlignment="Left"
+                                            Style="{StaticResource ButtonTitleStyle}"
+                                            Text="{Binding SelectedHoliday.FlightDuration, FallbackValue='0h 00m'}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Margin="0,10,0,0"
+                                Padding="12"
+                                Background="{StaticResource ButtonBackground}"
+                                CornerRadius="10">
+                                <StackPanel>
+                                    <TextBlock
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource ButtonSubTitleStyle}"
+                                        Text="Temperature" />
+                                    <TextBlock
+                                        Margin="0,4,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource ButtonTitleStyle}"
+                                        Text="{Binding SelectedHoliday.SummerTemperature, FallbackValue='00–00°C'}" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock
+                                Margin="0,14,0,0"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource ButtonSubTitleStyle}"
+                                Text="{Binding SelectedHoliday.Verdict}"
+                                TextWrapping="Wrap" />
+
+                            <Border
+                                Margin="0,18,0,0"
+                                Padding="12"
+                                Background="{StaticResource InfoBackgroundColour}"
+                                CornerRadius="10">
+                                <StackPanel>
+                                    <TextBlock
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource ButtonTitleStyle}"
+                                        Text="Hovered Attraction" />
+
+                                    <TextBlock
+                                        Margin="0,6,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource ButtonTitleStyle}"
+                                        Text="{Binding HoveredAttraction.Name}" />
+
+                                    <TextBlock
+                                        Margin="0,4,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource ButtonSubTitleStyle}"
+                                        Text="{Binding HoveredAttraction.Description}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock
+                                Margin="0,22,0,10"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource TitleStyle}"
+                                Text="Attractions" />
+
+                            <ItemsControl ItemsSource="{Binding SelectedHoliday.Attractions}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Margin="0,0,0,14"
+                                            Padding="12"
+                                            AllowDrop="True"
+                                            Background="{StaticResource ButtonBackground}"
+                                            CornerRadius="12"
+                                            DragOver="AttractionImage_DragOver"
+                                            Drop="AttractionImage_Drop"
+                                            Tag="{Binding}">
+
+                                            <StackPanel>
+                                                <Border
+                                                    Height="155"
+                                                    Background="{StaticResource PrimaryPanelColour}"
+                                                    ClipToBounds="True"
+                                                    CornerRadius="10">
+
+                                                    <Grid>
+                                                        <Image Source="{Binding ImagePath, Converter={StaticResource ImagePathToImageSourceConverter}}" Stretch="UniformToFill" />
+
+                                                        <TextBlock
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            Style="{StaticResource ButtonSubTitleStyle}"
+                                                            Text="Drop attraction image here" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <TextBlock
+                                                    Margin="0,10,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    Style="{StaticResource ButtonTitleStyle}"
+                                                    Text="{Binding Name}" />
+
+                                                <TextBlock
+                                                    Margin="0,4,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    Style="{StaticResource ButtonSubTitleStyle}"
+                                                    Text="{Binding Description}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>

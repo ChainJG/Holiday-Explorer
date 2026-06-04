@@ -1,29 +1,29 @@
-﻿namespace Holiday_Explorer.Core.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Holiday_Explorer.Core.Models
 {
     public sealed class HolidayOption
     {
-        public required string Id { get; init; }
+        public string Id { get; init; } = string.Empty;
 
-        public required string Name { get; init; }
+        public string Name { get; init; } = string.Empty;
 
-        public required string Country { get; init; }
+        public string Country { get; init; } = string.Empty;
 
-        public required double Latitude { get; init; }
+        public double Latitude { get; init; }
 
-        public required double Longitude { get; init; }
+        public double Longitude { get; init; }
 
-        public required MoneyRange EstimatedFlightPriceForTwo { get; init; }
+        public double Score { get; init; }
 
-        public required string FlightDuration { get; init; }
+        public string FlightDuration { get; init; } = string.Empty;
 
-        public required string SummerTemperature { get; init; }
+        public string SummerTemperature { get; init; } = string.Empty;
 
-        public required double Score { get; init; }
+        public string Verdict { get; init; } = string.Empty;
 
-        public required string Verdict { get; init; }
+        public MoneyRange EstimatedFlightPriceForTwo { get; init; } = new();
 
-        public List<string> Tags { get; init; } = [];
-
-        public List<Attraction> Attractions { get; init; } = [];
+        public ObservableCollection<AttractionOption> Attractions { get; init; } = [];
     }
 }
