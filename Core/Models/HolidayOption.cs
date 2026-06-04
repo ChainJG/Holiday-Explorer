@@ -1,6 +1,6 @@
 ﻿namespace Holiday_Explorer.Core.Models
 {
-    class HolidayOption
+    public sealed class HolidayOption
     {
         public required string Id { get; init; }
 

@@ -59,34 +59,37 @@ namespace Holiday_Explorer.MVVM.Windows
         {
             var holidays = new[]
             {
-            new
-            {
-                id = "barcelona",
-                name = "Barcelona",
-                country = "Spain",
-                latitude = 41.3874,
-                longitude = 2.1686,
-                score = 9.0
-            },
-            new
-            {
-                id = "paris",
-                name = "Paris",
-                country = "France",
-                latitude = 48.8566,
-                longitude = 2.3522,
-                score = 8.5
-            },
-            new
-            {
-                id = "dubai",
-                name = "Dubai",
-                country = "United Arab Emirates",
-                latitude = 25.2048,
-                longitude = 55.2708,
-                score = 7.0
-            }
-        };
+                new
+                {
+                    id = "barcelona",
+                    name = "Barcelona",
+                    country = "Spain",
+                    latitude = 41.3874,
+                    longitude = 2.1686,
+                    score = 9.0,
+                    flightDuration = "2h 20m"
+                },
+                new
+                {
+                    id = "paris",
+                    name = "Paris",
+                    country = "France",
+                    latitude = 48.8566,
+                    longitude = 2.3522,
+                    score = 8.5,
+                    flightDuration = "1h 20m"
+                },
+                new
+                {
+                    id = "dubai",
+                    name = "Dubai",
+                    country = "United Arab Emirates",
+                    latitude = 25.2048,
+                    longitude = 55.2708,
+                    score = 7.0,
+                    flightDuration = "7h"
+                }
+            };
 
             string json = JsonSerializer.Serialize(holidays);
 
