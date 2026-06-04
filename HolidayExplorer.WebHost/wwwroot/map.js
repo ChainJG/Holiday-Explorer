@@ -30,6 +30,7 @@ function initialiseMap() {
 
     holidayMap.createPane("travel-routes");
     holidayMap.getPane("travel-routes").style.zIndex = 450;
+    holidayMap.getPane("travel-routes").style.opacity = 0.6;
 
     holidayMap.createPane("airports");
     holidayMap.getPane("airports").style.zIndex = 500;
@@ -91,7 +92,6 @@ function loadHolidayMarkers(holidays) {
         holidayMarkers.push(marker);
     });
 }
-
 function loadAirportMarkers(airports) {
     clearAirportMarkers();
 

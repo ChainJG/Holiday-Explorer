@@ -173,6 +173,25 @@ button.stat-card {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
+.airport-marker {
+    background: transparent;
+    border: none;
+}
+
+.airport-pin {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(235, 235, 235, 0.65);
+    color: rgba(235, 235, 235, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 .attraction-pin {
     width: 30px;
     height: 30px;
@@ -210,21 +229,3 @@ button.stat-card {
     }
 }
 
-.airport-marker {
-    background: transparent;
-    border: none;
-}
-
-.airport-pin {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(235, 235, 235, 0.65);
-    color: rgba(235, 235, 235, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}

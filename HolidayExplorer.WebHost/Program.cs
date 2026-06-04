@@ -13,17 +13,18 @@ WebApplication app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.MapGet("/api/airports", async (AirportDatabaseService airportDatabase) =>
-{
-    var airports = await airportDatabase.LoadAirportsAsync();
-
-    return Results.Ok(airports);
-});
 
 app.MapGet("/api/holidays", async (HolidayCatalogueStorageService storage) =>
 {
     var holidays = await storage.LoadAsync();
     return Results.Ok(holidays);
+});
+
+app.MapGet("/api/airports", async (AirportDatabaseService airportDatabase) =>
+{
+    var airports = await airportDatabase.LoadAirportsAsync();
+
+    return Results.Ok(airports);
 });
 
 app.MapGet("/api/attractions/{attractionId}/image", async (
