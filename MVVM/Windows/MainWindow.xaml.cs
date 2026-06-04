@@ -14,9 +14,12 @@ namespace Holiday_Explorer.MVVM.Windows
 {
     public partial class MainWindow : Window
     {
-        private readonly MainWindowViewModel _viewModel = new();
+        private readonly HolidayCatalogueStorageService _catalogueStorageService = new();
         private readonly AttractionImageStorageService _imageStorageService = new();
+        private readonly AttractionImageLookupService _attractionImageLookupService;
+        private readonly MainWindowViewModel _viewModel;
 
+        private readonly HashSet<string> _holidaysCurrentlyLoadingImages = [];
         private bool _hasLoadedMap;
 
         [DllImport("user32.dll")]
@@ -24,6 +27,9 @@ namespace Holiday_Explorer.MVVM.Windows
 
         public MainWindow()
         {
+            _attractionImageLookupService = new AttractionImageLookupService(_imageStorageService);
+            _viewModel = new MainWindowViewModel(_catalogueStorageService);
+
             InitializeComponent();
 
             DataContext = _viewModel;
@@ -54,6 +60,8 @@ namespace Holiday_Explorer.MVVM.Windows
             }
 
             _hasLoadedMap = true;
+
+            await _viewModel.LoadAsync();
 
             await HolidayMapWebView.EnsureCoreWebView2Async();
 
@@ -159,6 +167,8 @@ namespace Holiday_Explorer.MVVM.Windows
 
             string escapedHolidayId = JsonSerializer.Serialize(holidayId);
             await HolidayMapWebView.CoreWebView2.ExecuteScriptAsync($"selectHolidayById({escapedHolidayId});");
+
+            await AutoFindMissingImagesForSelectedHolidayAsync();
         }
 
         private void HandleAttractionHovered(JsonDocument document)
@@ -178,6 +188,117 @@ namespace Holiday_Explorer.MVVM.Windows
             _viewModel.HoverAttraction(attractionId);
         }
 
+        private async Task AutoFindMissingImagesForSelectedHolidayAsync()
+        {
+            if (_viewModel.SelectedHoliday is null)
+            {
+                return;
+            }
+
+            string holidayId = _viewModel.SelectedHoliday.Id;
+
+            if (!_holidaysCurrentlyLoadingImages.Add(holidayId))
+            {
+                return;
+            }
+
+            try
+            {
+                bool hasDownloadedAnyImage = false;
+
+                foreach (AttractionOption attraction in _viewModel.SelectedHoliday.Attractions)
+                {
+                    if (HasUsableImage(attraction))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        bool foundImage = await _attractionImageLookupService.TryAutoFillImageAsync(
+                            _viewModel.SelectedHoliday,
+                            attraction);
+
+                        if (foundImage)
+                        {
+                            hasDownloadedAnyImage = true;
+                        }
+                    }
+                    catch
+                    {
+                        // Keep selection smooth even if one image lookup fails.
+                    }
+                }
+
+                if (hasDownloadedAnyImage)
+                {
+                    await _viewModel.SaveAsync();
+                }
+            }
+            finally
+            {
+                _holidaysCurrentlyLoadingImages.Remove(holidayId);
+            }
+        }
+
+        private async void RetryAttractionImage_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { Tag: AttractionOption attraction })
+            {
+                return;
+            }
+
+            if (_viewModel.SelectedHoliday is null)
+            {
+                return;
+            }
+
+            if (attraction.IsReplacingImage)
+            {
+                return;
+            }
+
+            try
+            {
+                attraction.IsReplacingImage = true;
+
+                bool foundImage = await _attractionImageLookupService.TryAutoFillImageAsync(
+                    _viewModel.SelectedHoliday,
+                    attraction);
+
+                if (!foundImage)
+                {
+                    MessageBox.Show(
+                        "No replacement image was found for this attraction.",
+                        "Holiday Explorer",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    return;
+                }
+
+                await _viewModel.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Unable to replace attraction image",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            finally
+            {
+                attraction.IsReplacingImage = false;
+            }
+        }
+
+        private static bool HasUsableImage(AttractionOption attraction)
+        {
+            return !string.IsNullOrWhiteSpace(attraction.ImagePath)
+                   && File.Exists(attraction.ImagePath);
+        }
+
         private void AttractionImage_DragOver(object sender, DragEventArgs e)
         {
             e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop)
@@ -187,7 +308,7 @@ namespace Holiday_Explorer.MVVM.Windows
             e.Handled = true;
         }
 
-        private void AttractionImage_Drop(object sender, DragEventArgs e)
+        private async void AttractionImage_Drop(object sender, DragEventArgs e)
         {
             if (sender is not FrameworkElement { Tag: AttractionOption attraction })
             {
@@ -211,6 +332,8 @@ namespace Holiday_Explorer.MVVM.Windows
                 attraction.ImagePath = _imageStorageService.SaveAttractionImage(
                     files[0],
                     attraction.Id);
+
+                await _viewModel.SaveAsync();
             }
             catch (Exception ex)
             {

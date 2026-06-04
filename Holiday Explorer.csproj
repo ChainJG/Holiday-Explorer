@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Content Include="Data\holidays.seed.json">
+	 <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
     <Content Include="Assets\Map\map.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -31,6 +34,7 @@
     <Folder Include="Core\Interfaces\" />
     <Folder Include="MVVM\UserControls\" />
     <Folder Include="Features\" />
+    <Folder Include="Data\" />
     <Folder Include="Shared\Helpers\" />
   </ItemGroup>
 

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:Holiday_Explorer.MVVM.AttachedProperties"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="Holiday Explorer"
     Width="1200"
@@ -59,14 +60,14 @@
                     Orientation="Horizontal">
 
                     <Button
+                        ui:PackIconKindAssist.IconKind="WindowMinimize"
                         Click="BtnMinimiseWindow_Click"
-                        Style="{StaticResource TitleBarButtonStyle}"
-                        Tag="WindowMinimize" />
+                        Style="{StaticResource TitleBarButtonStyle}" />
 
                     <Button
+                        ui:PackIconKindAssist.IconKind="WindowClose"
                         Click="BtnExitApplication_Click"
-                        Style="{StaticResource TitleBarButtonStyle}"
-                        Tag="WindowClose" />
+                        Style="{StaticResource TitleBarButtonStyle}" />
                 </StackPanel>
             </Grid>
             <!--#endregion-->
@@ -94,19 +95,18 @@
                     Grid.Column="1"
                     Width="6"
                     HorizontalAlignment="Stretch"
-                    Background="{StaticResource SecondaryPanelColour}"
-                    Opacity=".2" />
+                    Background="Transparent" />
 
                 <Border
                     Grid.Column="2"
                     Margin="0,10,10,10"
-                    Padding="10"
+                    Padding="20,0,20,0"
                     Background="{StaticResource SecondaryPanelColour}"
                     CornerRadius="8">
 
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden">
 
+                        <StackPanel Margin="0,20,0,0">
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource TitleStyle}"
@@ -118,6 +118,7 @@
                                 Style="{StaticResource SubTitleStyle}"
                                 Text="{Binding SelectedHoliday.Country, FallbackValue='Country'}" />
 
+                            <!--#region Flight Price, Duration Border-->
                             <Border
                                 Margin="0,15,0,0"
                                 Padding="15"
@@ -130,6 +131,7 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
+                                    <!--#region Flight Price-->
                                     <StackPanel Grid.Column="0">
                                         <TextBlock
                                             HorizontalAlignment="Left"
@@ -141,7 +143,9 @@
                                             Style="{StaticResource ButtonTitleStyle}"
                                             Text="{Binding SelectedHoliday.EstimatedFlightPriceForTwo.DisplayText, FallbackValue='£00-£000'}" />
                                     </StackPanel>
+                                    <!--#endregion-->
 
+                                    <!--#region Flight Duration Text-->
                                     <StackPanel Grid.Column="1">
                                         <TextBlock
                                             HorizontalAlignment="Left"
@@ -153,14 +157,18 @@
                                             Style="{StaticResource ButtonTitleStyle}"
                                             Text="{Binding SelectedHoliday.FlightDuration, FallbackValue='0h 00m'}" />
                                     </StackPanel>
+                                    <!--#endregion-->
                                 </Grid>
                             </Border>
+                            <!--#endregion-->
 
+                            <!--#region Temperature Boarder-->
                             <Border
                                 Margin="0,10,0,0"
-                                Padding="12"
+                                Padding="15"
                                 Background="{StaticResource ButtonBackground}"
                                 CornerRadius="10">
+                                <!--#region Temperature-->
                                 <StackPanel>
                                     <TextBlock
                                         HorizontalAlignment="Left"
@@ -172,15 +180,18 @@
                                         Style="{StaticResource ButtonTitleStyle}"
                                         Text="{Binding SelectedHoliday.SummerTemperature, FallbackValue='00–00°C'}" />
                                 </StackPanel>
+                                <!--#endregion-->
                             </Border>
+                            <!--#endregion-->
 
                             <TextBlock
-                                Margin="0,14,0,0"
+                                Margin="0,15,0,0"
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource ButtonSubTitleStyle}"
                                 Text="{Binding SelectedHoliday.Verdict}"
                                 TextWrapping="Wrap" />
 
+                            <!--#region Hovered Attraction-->
                             <Border
                                 Margin="0,18,0,0"
                                 Padding="12"
@@ -206,18 +217,21 @@
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
+                            <!--#endregion-->
 
+                            <!--#region Attractions-->
                             <TextBlock
-                                Margin="0,22,0,10"
+                                Margin="0,20,0,10"
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource TitleStyle}"
                                 Text="Attractions" />
 
+                            <!--#region Attractions ItemsControl-->
                             <ItemsControl ItemsSource="{Binding SelectedHoliday.Attractions}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border
-                                            Margin="0,0,0,14"
+                                            Margin="0,0,0,15"
                                             Padding="12"
                                             AllowDrop="True"
                                             Background="{StaticResource ButtonBackground}"
@@ -240,7 +254,19 @@
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center"
                                                             Style="{StaticResource ButtonSubTitleStyle}"
-                                                            Text="Drop attraction image here" />
+                                                            Text="Drop attraction image here"
+                                                            Visibility="{Binding HasImage, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+                                                        <Button
+                                                            Margin="8"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            ui:PackIconKindAssist.IconKind="Refresh"
+                                                            Click="RetryAttractionImage_Click"
+                                                            Style="{StaticResource TitleBarButtonStyle}"
+                                                            Tag="{Binding}"
+                                                            ToolTip="Retry and replace image"
+                                                            Visibility="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource VisibleWhenTrueConverter}}" />
                                                     </Grid>
                                                 </Border>
 
@@ -261,6 +287,9 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <!--#endregion-->
+                            <!--#endregion-->
+
                         </StackPanel>
                     </ScrollViewer>
                 </Border>

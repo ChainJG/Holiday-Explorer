@@ -4,7 +4,7 @@ namespace Holiday_Explorer.Infrastructure.Http
 {
     public static class HttpClientProvider
     {
-        private const int DefaultClientTimeoutSeconds = 15;
+        private const int DefaultClientTimeoutSeconds = 30;
 
         private static readonly Lazy<HttpClient> SharedClient = new(CreateClient);
 
@@ -12,10 +12,13 @@ namespace Holiday_Explorer.Infrastructure.Http
 
         private static HttpClient CreateClient()
         {
-            var client = new HttpClient
+            HttpClient client = new()
             {
                 Timeout = TimeSpan.FromSeconds(DefaultClientTimeoutSeconds)
             };
+
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                "HolidayExplorer/1.0 (local WPF holiday planner)");
 
             return client;
         }

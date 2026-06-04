@@ -18,6 +18,14 @@ namespace Holiday_Explorer.Core.Models
 
         public double Longitude { get; init; }
 
+        private bool _isReplacingImage;
+
+        public bool IsReplacingImage
+        {
+            get => _isReplacingImage;
+            set => SetProperty(ref _isReplacingImage, value);
+        }
+
         public string? ImagePath
         {
             get => _imagePath;
@@ -29,6 +37,12 @@ namespace Holiday_Explorer.Core.Models
                 }
             }
         }
+
+        public string? ImageSourceUrl { get; set; }
+
+        public string? ImageProvider { get; set; }
+
+        public string? ImageCredit { get; set; }
 
         public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath);
     }

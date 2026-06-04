@@ -50,13 +50,10 @@ function addStartingPointMarker() {
         [startingPoint.latitude, startingPoint.longitude],
         {
             icon: startingPointIcon,
-            zIndexOffset: 1000
+            zIndexOffset: 1000,
+            title: startingPoint.location
         })
-        .addTo(holidayMap)
-        .bindPopup(`
-            <strong>${startingPoint.name}</strong><br/>
-            ${startingPoint.location}
-        `);
+        .addTo(holidayMap);
 }
 
 function loadHolidayMarkers(holidays) {
@@ -66,17 +63,15 @@ function loadHolidayMarkers(holidays) {
     clearAttractionMarkers();
 
     loadedHolidays.forEach(holiday => {
-        const marker = L.marker([holiday.latitude, holiday.longitude])
-            .addTo(holidayMap)
-            .bindPopup(`
-                <strong>${holiday.name}</strong><br/>
-                ${holiday.country}<br/>
-                Score: ${holiday.score}/10
-            `);
+        const marker = L.marker(
+            [holiday.latitude, holiday.longitude],
+            {
+                title: `${holiday.name}, ${holiday.country}`
+            })
+            .addTo(holidayMap);
 
         marker.on('click', () => {
             sendHolidaySelectedMessage(holiday.id);
-            selectHolidayById(holiday.id);
         });
 
         marker.on('mouseover', () => {
@@ -134,13 +129,10 @@ function loadAttractionMarkers(holiday) {
             [attraction.latitude, attraction.longitude],
             {
                 icon: attractionIcon,
-                pane: "attractions"
+                pane: "attractions",
+                title: attraction.name
             })
-            .addTo(holidayMap)
-            .bindPopup(`
-                <strong>${attraction.name}</strong><br/>
-                ${attraction.description}
-            `);
+            .addTo(holidayMap);
 
         marker.on('mouseover', () => {
             sendAttractionHoveredMessage(attraction.id);
