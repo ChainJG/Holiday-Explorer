@@ -12,7 +12,10 @@ async function startHolidayExplorer() {
 
     window.addEventListener("holiday-selected", event => {
         currentHoliday = event.detail;
-        renderHoliday(currentHoliday);
+
+        renderHoliday(currentHoliday).catch(error => {
+            console.error("Failed to render holiday:", error);
+        });
     });
 
     window.addEventListener("attraction-hovered", event => {
@@ -33,7 +36,7 @@ async function startHolidayExplorer() {
 }
 
 async function fetchHolidays() {
-    const response = await fetch("/api/holidays");
+    const response = await fetch("data/holidays.json");
 
     if (!response.ok) {
         throw new Error("Failed to load holidays.");
@@ -43,7 +46,7 @@ async function fetchHolidays() {
 }
 
 async function fetchAirports() {
-    const response = await fetch("/api/airports");
+    const response = await fetch("data/airports.json");
 
     if (!response.ok) {
         throw new Error("Failed to load airports.");
@@ -52,7 +55,7 @@ async function fetchAirports() {
     return await response.json();
 }
 
-function renderHoliday(holiday) {
+async function renderHoliday(holiday) {
     document.getElementById("holidayName").textContent = holiday.name;
     document.getElementById("holidayCountry").textContent = holiday.country;
 
@@ -64,26 +67,29 @@ function renderHoliday(holiday) {
     document.getElementById("score").textContent = `${holiday.score}/10`;
     document.getElementById("verdict").textContent = holiday.verdict;
 
-    renderAttractions(holiday.attractions ?? []);
+    await renderAttractions(holiday, holiday.attractions ?? []);
 }
 
-function renderAttractions(attractions) {
+async function renderAttractions(holiday, attractions) {
     const container = document.getElementById("attractionList");
 
     container.innerHTML = "";
 
-    attractions.forEach(attraction => {
+    for (const attraction of attractions) {
         const card = document.createElement("article");
         card.className = "attraction-card";
 
         const image = document.createElement("img");
         image.alt = attraction.name;
+        image.loading = "lazy";
 
-        if (attraction.hasImage || attraction.imagePath) {
-            image.src = buildAttractionImageUrl(attraction);
+        const resolvedImageUrl = await resolveAttractionImageUrl(holiday, attraction);
+
+        if (resolvedImageUrl) {
+            image.src = resolvedImageUrl;
 
             image.onerror = () => {
-                console.warn("Failed to load attraction image:", attraction);
+                console.warn("Failed to load resolved attraction image:", attraction);
                 image.remove();
             };
         }
@@ -107,11 +113,7 @@ function renderAttractions(attractions) {
         card.appendChild(content);
 
         container.appendChild(card);
-    });
-}
-
-function buildAttractionImageUrl(attraction) {
-    return `/api/attractions/${encodeURIComponent(attraction.id)}/image?v=${Date.now()}`;
+    }
 }
 
 function renderHoveredAttraction(attraction) {

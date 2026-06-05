@@ -1,0 +1,38 @@
+[
+  {
+    "id": "barcelona",
+    "name": "Barcelona",
+    "country": "Spain",
+    "latitude": 41.3874,
+    "longitude": 2.1686,
+    "score": 9.0,
+    "flightDuration": "2h 20m",
+    "summerTemperature": "26–28°C",
+    "verdict": "Best balance of price, landmarks, weather, and beach.",
+    "estimatedFlightPriceForTwo": {
+      "minimum": 58,
+      "maximum": 74,
+      "currencySymbol": "£"
+    },
+    "attractions": [
+      {
+        "id": "barcelona-sagrada-familia",
+        "holidayId": "barcelona",
+        "name": "Sagrada Família",
+        "description": "Barcelona's most famous basilica and one of the city's biggest landmarks.",
+        "latitude": 41.4036,
+        "longitude": 2.1744,
+        "imagePath": null
+      },
+      {
+        "id": "barcelona-park-guell",
+        "holidayId": "barcelona",
+        "name": "Park Güell",
+        "description": "A colourful public park designed by Antoni Gaudí.",
+        "latitude": 41.4145,
+        "longitude": 2.1527,
+        "imagePath": null
+      }
+    ]
+  }
+]
