@@ -6,3 +6,4 @@ publish/
 packages/
 *.user
 *.suo
+Tools/Source/*.csv

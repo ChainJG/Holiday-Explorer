@@ -1,9 +1,16 @@
 let holidayMap;
 let holidayMarkers = [];
 let attractionMarkers = [];
-let airportMarkers = [];
 let activeTravelRoute;
 let loadedHolidays = [];
+let airportMarkers = [];
+let loadedAirports = [];
+let selectedHolidayForAirportLayer = null;
+
+const ORIGIN_AIRPORT_CODE = "EMA";
+const AIRPORT_MIN_ZOOM = 6;
+const SELECTED_HOLIDAY_AIRPORT_RADIUS_KM = 180;
+const MAX_AIRPORT_MARKERS = 35;
 
 const startingPoint = {
     id: "starting-point",
@@ -40,6 +47,8 @@ function initialiseMap() {
     holidayMap.getPane("attractions").style.zIndex = 650;
 
     addStartingPointMarker();
+
+    holidayMap.on("zoomend moveend", updateAirportMarkers);
 }
 
 function addStartingPointMarker() {
@@ -81,25 +90,32 @@ function loadHolidayMarkers(holidays) {
             }));
         });
 
-        marker.on("mouseover", () => {
-            showTravelRouteToHoliday(holiday);
-        });
+        marker.on("click", () => {
+            selectHolidayById(holiday.id);
 
-        marker.on("mouseout", () => {
-            clearTravelRoute();
+            window.dispatchEvent(new CustomEvent("holiday-selected", {
+                detail: holiday
+            }));
         });
 
         holidayMarkers.push(marker);
     });
 }
 function loadAirportMarkers(airports) {
-    clearAirportMarkers();
+    loadedAirports = airports ?? [];
+    updateAirportMarkers();
+}
 
-    if (!airports || airports.length === 0) {
+function updateAirportMarkers() {
+    if (!holidayMap || !loadedAirports || loadedAirports.length === 0) {
         return;
     }
 
-    airports.forEach(airport => {
+    clearAirportMarkers();
+
+    const airportsToRender = getAirportsForCurrentMapState();
+
+    airportsToRender.forEach(airport => {
         const airportIcon = L.divIcon({
             className: "airport-marker",
             html: `<div class="airport-pin">✈</div>`,
@@ -120,9 +136,122 @@ function loadAirportMarkers(airports) {
     });
 }
 
+function getAirportsForCurrentMapState() {
+    const originAirport = loadedAirports.find(airport =>
+        airport.code?.toUpperCase() === ORIGIN_AIRPORT_CODE);
+
+    let airportsToShow = [];
+
+    if (selectedHolidayForAirportLayer) {
+        airportsToShow = getAirportsNearHoliday(selectedHolidayForAirportLayer);
+    }
+    else if (holidayMap.getZoom() >= AIRPORT_MIN_ZOOM) {
+        airportsToShow = getAirportsInsideCurrentMapView();
+    }
+
+    if (originAirport) {
+        airportsToShow.unshift(originAirport);
+    }
+
+    return getUniqueAirports(airportsToShow)
+        .slice(0, MAX_AIRPORT_MARKERS);
+}
+
+function getAirportsNearHoliday(holiday) {
+    return loadedAirports
+        .map(airport => ({
+            airport,
+            distanceKm: calculateDistanceKm(
+                holiday.latitude,
+                holiday.longitude,
+                airport.latitude,
+                airport.longitude)
+        }))
+        .filter(item => item.distanceKm <= SELECTED_HOLIDAY_AIRPORT_RADIUS_KM)
+        .sort((a, b) => {
+            if (a.airport.isPreferredForCity && !b.airport.isPreferredForCity) {
+                return -1;
+            }
+
+            if (!a.airport.isPreferredForCity && b.airport.isPreferredForCity) {
+                return 1;
+            }
+
+            return a.distanceKm - b.distanceKm;
+        })
+        .map(item => item.airport);
+}
+
+function getAirportsInsideCurrentMapView() {
+    const bounds = holidayMap.getBounds();
+    const center = holidayMap.getCenter();
+
+    return loadedAirports
+        .filter(airport =>
+            bounds.contains([airport.latitude, airport.longitude]))
+        .map(airport => ({
+            airport,
+            distanceKm: calculateDistanceKm(
+                center.lat,
+                center.lng,
+                airport.latitude,
+                airport.longitude)
+        }))
+        .sort((a, b) => {
+            if (a.airport.isPreferredForCity && !b.airport.isPreferredForCity) {
+                return -1;
+            }
+
+            if (!a.airport.isPreferredForCity && b.airport.isPreferredForCity) {
+                return 1;
+            }
+
+            return a.distanceKm - b.distanceKm;
+        })
+        .map(item => item.airport);
+}
+
+function getUniqueAirports(airports) {
+    const seenCodes = new Set();
+
+    return airports.filter(airport => {
+        const code = airport.code?.toUpperCase();
+
+        if (!code || seenCodes.has(code)) {
+            return false;
+        }
+
+        seenCodes.add(code);
+        return true;
+    });
+}
+
 function clearAirportMarkers() {
     airportMarkers.forEach(marker => holidayMap.removeLayer(marker));
     airportMarkers = [];
+}
+
+function calculateDistanceKm(latitude1, longitude1, latitude2, longitude2) {
+    const earthRadiusKm = 6371;
+
+    const dLat = toRadians(latitude2 - latitude1);
+    const dLon = toRadians(longitude2 - longitude1);
+
+    const lat1 = toRadians(latitude1);
+    const lat2 = toRadians(latitude2);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadiusKm * c;
+}
+
+function toRadians(degrees) {
+    return degrees * Math.PI / 180;
 }
 
 function selectHolidayById(holidayId) {
@@ -134,6 +263,8 @@ function selectHolidayById(holidayId) {
 
     clearTravelRoute();
     clearAttractionMarkers();
+
+    showTravelRouteToHoliday(holiday);
 
     holidayMap.flyTo(
         [holiday.latitude, holiday.longitude],
@@ -202,8 +333,8 @@ function showTravelRouteToHoliday(holiday) {
     activeTravelRoute = L.polyline(routePoints, {
         pane: "travel-routes",
         color: "#2f80ed",
-        weight: 3,
-        opacity: 0.9,
+        weight: 4,
+        opacity: 1,
         dashArray: "8, 12",
         lineCap: "round",
         lineJoin: "round",
