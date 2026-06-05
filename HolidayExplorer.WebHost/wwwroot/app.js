@@ -52,7 +52,21 @@ async function fetchAirports() {
         throw new Error("Failed to load airports.");
     }
 
-    return await response.json();
+    const loadedAirports = await response.json();
+
+    return loadedAirports.map(normaliseAirport);
+}
+
+function normaliseAirport(airport) {
+    return {
+        code: airport.code ?? airport.Code ?? "",
+        name: airport.name ?? airport.Name ?? "",
+        city: airport.city ?? airport.City ?? "",
+        country: airport.country ?? airport.Country ?? "",
+        latitude: airport.latitude ?? airport.Latitude ?? 0,
+        longitude: airport.longitude ?? airport.Longitude ?? 0,
+        isPreferredForCity: airport.isPreferredForCity ?? airport.IsPreferredForCity ?? false
+    };
 }
 
 async function renderHoliday(holiday) {
