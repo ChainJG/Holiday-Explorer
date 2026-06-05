@@ -287,4 +287,13 @@ function getTravelTimeText(holiday) {
     return `✈ Derby → ${destinationName} • ${flightDuration}`;
 }
 
-document.addEventListener("DOMContentLoaded", initialiseMap);
+let mapReadyResolve;
+
+const mapReady = new Promise(resolve => {
+    mapReadyResolve = resolve;
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    initialiseMap();
+    mapReadyResolve();
+});

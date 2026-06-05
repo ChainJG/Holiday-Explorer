@@ -133,10 +133,6 @@ function formatMoneyRange(range) {
     return `${symbol}${range.minimum}–${symbol}${range.maximum}`;
 }
 
-function buildAttractionImageUrl(attraction) {
-    return `/api/attractions/${encodeURIComponent(attraction.id)}/image?v=${Date.now()}`;
-}
-
 function openFlightSearch(holiday) {
     const originCode = "ema";
     const destinationAirport = findBestAirportForHoliday(holiday);
@@ -224,7 +220,33 @@ function formatSkyscannerDate(date) {
     return `${year}${month}${day}`;
 }
 
-startHolidayExplorer().catch(error => {
-    console.error(error);
-    alert("Holiday Explorer failed to start.");
-});
+async function startHolidayExplorer() {
+    await mapReady;
+
+    const holidays = await fetchHolidays();
+    airports = await fetchAirports();
+
+    loadHolidayMarkers(holidays);
+    loadAirportMarkers(airports);
+
+    window.addEventListener("holiday-selected", event => {
+        currentHoliday = event.detail;
+        renderHoliday(currentHoliday);
+    });
+
+    window.addEventListener("attraction-hovered", event => {
+        renderHoveredAttraction(event.detail);
+    });
+
+    window.addEventListener("attraction-hover-ended", () => {
+        clearHoveredAttraction();
+    });
+
+    document.getElementById("flightPriceCard").addEventListener("click", () => {
+        if (!currentHoliday) {
+            return;
+        }
+
+        openFlightSearch(currentHoliday);
+    });
+}
