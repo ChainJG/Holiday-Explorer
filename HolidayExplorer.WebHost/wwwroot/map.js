@@ -9,7 +9,8 @@ let selectedHolidayForAirportLayer = null;
 
 const AIRPORT_MIN_ZOOM = 10;
 const AIRPORT_RADIUS_KM = 180;
-const MAX_AIRPORTS_PER_HOLIDAY = 2;
+const MAX_AIRPORTS_PER_HOLIDAY = 3;
+const ACTIVE_HOLIDAY_VIEW_RADIUS_KM = 35;
 
 const startingPoint = {
     id: "starting-point",
@@ -89,14 +90,6 @@ function loadHolidayMarkers(holidays) {
             }));
         });
 
-        marker.on("click", () => {
-            selectHolidayById(holiday.id);
-
-            window.dispatchEvent(new CustomEvent("holiday-selected", {
-                detail: holiday
-            }));
-        });
-
         holidayMarkers.push(marker);
     });
 }
@@ -117,6 +110,10 @@ function updateAirportMarkers() {
     }
 
     if (holidayMap.getZoom() < AIRPORT_MIN_ZOOM) {
+        return;
+    }
+
+    if (!isSelectedHolidayCloseToCurrentMapView()) {
         return;
     }
 
@@ -143,6 +140,22 @@ function updateAirportMarkers() {
     });
 }
 
+function isSelectedHolidayCloseToCurrentMapView() {
+    if (!selectedHolidayForAirportLayer) {
+        return false;
+    }
+
+    const mapCenter = holidayMap.getCenter();
+
+    const distanceFromHolidayToMapCenterKm = calculateAirportDistanceKm(
+        selectedHolidayForAirportLayer.latitude,
+        selectedHolidayForAirportLayer.longitude,
+        mapCenter.lat,
+        mapCenter.lng);
+
+    return distanceFromHolidayToMapCenterKm <= ACTIVE_HOLIDAY_VIEW_RADIUS_KM;
+}
+
 function getNearestAirportsForSelectedHoliday() {
     if (!selectedHolidayForAirportLayer) {
         return [];
@@ -158,17 +171,7 @@ function getNearestAirportsForSelectedHoliday() {
                 airport.longitude)
         }))
         .filter(item => item.distanceKm <= AIRPORT_RADIUS_KM)
-        .sort((a, b) => {
-            if (a.airport.isPreferredForCity && !b.airport.isPreferredForCity) {
-                return -1;
-            }
-
-            if (!a.airport.isPreferredForCity && b.airport.isPreferredForCity) {
-                return 1;
-            }
-
-            return a.distanceKm - b.distanceKm;
-        })
+        .sort((a, b) => a.distanceKm - b.distanceKm)
         .slice(0, MAX_AIRPORTS_PER_HOLIDAY)
         .map(item => item.airport);
 }
@@ -195,7 +198,7 @@ function getUniqueAirports(airports) {
 }
 
 function calculateAirportDistanceKm(latitude1, longitude1, latitude2, longitude2) {
-    const earthRadiusKm = 6371;
+    const earthRadiusKm = 12371;
 
     const dLat = toAirportRadians(latitude2 - latitude1);
     const dLon = toAirportRadians(longitude2 - longitude1);
