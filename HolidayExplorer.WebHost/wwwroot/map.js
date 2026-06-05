@@ -1,16 +1,15 @@
 let holidayMap;
 let holidayMarkers = [];
 let attractionMarkers = [];
+let airportMarkers = [];
 let activeTravelRoute;
 let loadedHolidays = [];
-let airportMarkers = [];
 let loadedAirports = [];
 let selectedHolidayForAirportLayer = null;
 
-const ORIGIN_AIRPORT_CODE = "EMA";
-const AIRPORT_MIN_ZOOM = 6;
-const SELECTED_HOLIDAY_AIRPORT_RADIUS_KM = 120;
-const MAX_AIRPORT_MARKERS = 25;
+const AIRPORT_MIN_ZOOM = 10;
+const AIRPORT_RADIUS_KM = 180;
+const MAX_AIRPORTS_PER_HOLIDAY = 2;
 
 const startingPoint = {
     id: "starting-point",
@@ -121,8 +120,7 @@ function updateAirportMarkers() {
         return;
     }
 
-    const airportsToRender = getAirportsNearSelectedHoliday()
-        .slice(0, MAX_AIRPORT_MARKERS);
+    const airportsToRender = getNearestAirportsForSelectedHoliday();
 
     airportsToRender.forEach(airport => {
         const airportIcon = L.divIcon({
@@ -145,24 +143,21 @@ function updateAirportMarkers() {
     });
 }
 
-function getAirportsNearSelectedHoliday() {
+function getNearestAirportsForSelectedHoliday() {
     if (!selectedHolidayForAirportLayer) {
         return [];
     }
 
-    const originAirport = loadedAirports.find(airport =>
-        airport.code?.toUpperCase() === ORIGIN_AIRPORT_CODE);
-
-    const nearbyAirports = loadedAirports
+    return loadedAirports
         .map(airport => ({
             airport,
-            distanceKm: calculateDistanceKm(
+            distanceKm: calculateAirportDistanceKm(
                 selectedHolidayForAirportLayer.latitude,
                 selectedHolidayForAirportLayer.longitude,
                 airport.latitude,
                 airport.longitude)
         }))
-        .filter(item => item.distanceKm <= SELECTED_HOLIDAY_AIRPORT_RADIUS_KM)
+        .filter(item => item.distanceKm <= AIRPORT_RADIUS_KM)
         .sort((a, b) => {
             if (a.airport.isPreferredForCity && !b.airport.isPreferredForCity) {
                 return -1;
@@ -174,14 +169,15 @@ function getAirportsNearSelectedHoliday() {
 
             return a.distanceKm - b.distanceKm;
         })
+        .slice(0, MAX_AIRPORTS_PER_HOLIDAY)
         .map(item => item.airport);
-
-    if (originAirport) {
-        nearbyAirports.unshift(originAirport);
-    }
-
-    return getUniqueAirports(nearbyAirports);
 }
+
+function clearAirportMarkers() {
+    airportMarkers.forEach(marker => holidayMap.removeLayer(marker));
+    airportMarkers = [];
+}
+
 
 function getUniqueAirports(airports) {
     const seenCodes = new Set();
@@ -198,19 +194,14 @@ function getUniqueAirports(airports) {
     });
 }
 
-function clearAirportMarkers() {
-    airportMarkers.forEach(marker => holidayMap.removeLayer(marker));
-    airportMarkers = [];
-}
-
-function calculateDistanceKm(latitude1, longitude1, latitude2, longitude2) {
+function calculateAirportDistanceKm(latitude1, longitude1, latitude2, longitude2) {
     const earthRadiusKm = 6371;
 
-    const dLat = toRadians(latitude2 - latitude1);
-    const dLon = toRadians(longitude2 - longitude1);
+    const dLat = toAirportRadians(latitude2 - latitude1);
+    const dLon = toAirportRadians(longitude2 - longitude1);
 
-    const lat1 = toRadians(latitude1);
-    const lat2 = toRadians(latitude2);
+    const lat1 = toAirportRadians(latitude1);
+    const lat2 = toAirportRadians(latitude2);
 
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -222,7 +213,7 @@ function calculateDistanceKm(latitude1, longitude1, latitude2, longitude2) {
     return earthRadiusKm * c;
 }
 
-function toRadians(degrees) {
+function toAirportRadians(degrees) {
     return degrees * Math.PI / 180;
 }
 
@@ -232,6 +223,8 @@ function selectHolidayById(holidayId) {
     if (!holiday) {
         return;
     }
+
+    selectedHolidayForAirportLayer = holiday;
 
     clearTravelRoute();
     clearAttractionMarkers();
@@ -248,6 +241,7 @@ function selectHolidayById(holidayId) {
 
     window.setTimeout(() => {
         loadAttractionMarkers(holiday);
+        updateAirportMarkers();
     }, 650);
 }
 

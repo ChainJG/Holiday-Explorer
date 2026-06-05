@@ -134,10 +134,6 @@ function formatMoneyRange(range) {
     return `${symbol}${range.minimum}–${symbol}${range.maximum}`;
 }
 
-function buildAttractionImageUrl(attraction) {
-    return `/api/attractions/${encodeURIComponent(attraction.id)}/image?v=${Date.now()}`;
-}
-
 function openFlightSearch(holiday) {
     const originCode = "ema";
     const destinationAirport = findBestAirportForHoliday(holiday);

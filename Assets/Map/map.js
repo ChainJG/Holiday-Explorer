@@ -74,12 +74,11 @@ function loadHolidayMarkers(holidays) {
             sendHolidaySelectedMessage(holiday.id);
         });
 
-        marker.on('mouseover', () => {
-            showTravelRouteToHoliday(holiday);
-        });
-
-        marker.on('mouseout', () => {
-            clearTravelRoute();
+        marker.on("click", () => {
+            selectHolidayById(holiday.id);
+            window.dispatchEvent(new CustomEvent("holiday-selected", {
+                detail: holiday
+            }));
         });
 
         holidayMarkers.push(marker);
