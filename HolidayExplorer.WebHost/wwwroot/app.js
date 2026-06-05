@@ -42,7 +42,9 @@ async function fetchHolidays() {
         throw new Error("Failed to load holidays.");
     }
 
-    return await response.json();
+    const loadedHolidays = await response.json();
+
+    return loadedHolidays.map(normaliseHoliday);
 }
 
 async function fetchAirports() {
@@ -66,6 +68,53 @@ function normaliseAirport(airport) {
         latitude: airport.latitude ?? airport.Latitude ?? 0,
         longitude: airport.longitude ?? airport.Longitude ?? 0,
         isPreferredForCity: airport.isPreferredForCity ?? airport.IsPreferredForCity ?? false
+    };
+}
+function normaliseHoliday(holiday) {
+    return {
+        id: holiday.id ?? holiday.Id ?? "",
+        name: holiday.name ?? holiday.Name ?? "",
+        country: holiday.country ?? holiday.Country ?? "",
+        latitude: holiday.latitude ?? holiday.Latitude ?? 0,
+        longitude: holiday.longitude ?? holiday.Longitude ?? 0,
+        score: holiday.score ?? holiday.Score ?? 0,
+        flightSearchCodeOverride: holiday.flightSearchCodeOverride ?? holiday.FlightSearchCodeOverride ?? null,
+        flightDuration: holiday.flightDuration ?? holiday.FlightDuration ?? "",
+        summerTemperature: holiday.summerTemperature ?? holiday.SummerTemperature ?? "",
+        verdict: holiday.verdict ?? holiday.Verdict ?? "",
+        estimatedFlightPriceForTwo: normaliseMoneyRange(
+            holiday.estimatedFlightPriceForTwo ?? holiday.EstimatedFlightPriceForTwo),
+        attractions: (holiday.attractions ?? holiday.Attractions ?? []).map(normaliseAttraction)
+    };
+}
+
+function normaliseAttraction(attraction) {
+    return {
+        id: attraction.id ?? attraction.Id ?? "",
+        holidayId: attraction.holidayId ?? attraction.HolidayId ?? "",
+        name: attraction.name ?? attraction.Name ?? "",
+        description: attraction.description ?? attraction.Description ?? "",
+        latitude: attraction.latitude ?? attraction.Latitude ?? 0,
+        longitude: attraction.longitude ?? attraction.Longitude ?? 0,
+
+        imagePath: attraction.imagePath ?? attraction.ImagePath ?? null,
+        imageSourceUrl: attraction.imageSourceUrl ?? attraction.ImageSourceUrl ?? null,
+        imageProvider: attraction.imageProvider ?? attraction.ImageProvider ?? null,
+        imageCredit: attraction.imageCredit ?? attraction.ImageCredit ?? null,
+        hasImage: attraction.hasImage ?? attraction.HasImage ?? false
+    };
+}
+
+function normaliseMoneyRange(range) {
+    if (!range) {
+        return null;
+    }
+
+    return {
+        minimum: range.minimum ?? range.Minimum ?? 0,
+        maximum: range.maximum ?? range.Maximum ?? 0,
+        currencySymbol: range.currencySymbol ?? range.CurrencySymbol ?? "£",
+        displayText: range.displayText ?? range.DisplayText ?? ""
     };
 }
 
