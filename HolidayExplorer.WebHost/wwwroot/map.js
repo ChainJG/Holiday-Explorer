@@ -7,10 +7,8 @@ let loadedHolidays = [];
 let loadedAirports = [];
 let selectedHolidayForAirportLayer = null;
 
-const AIRPORT_MIN_ZOOM = 10;
 const AIRPORT_RADIUS_KM = 180;
 const MAX_AIRPORTS_PER_HOLIDAY = 3;
-const ACTIVE_HOLIDAY_VIEW_RADIUS_KM = 35;
 
 const startingPoint = {
     id: "starting-point",
@@ -47,8 +45,6 @@ function initialiseMap() {
     holidayMap.getPane("attractions").style.zIndex = 650;
 
     addStartingPointMarker();
-
-    holidayMap.on("zoomend moveend", updateAirportMarkers);
 }
 
 function addStartingPointMarker() {
@@ -95,25 +91,16 @@ function loadHolidayMarkers(holidays) {
 }
 function loadAirportMarkers(airports) {
     loadedAirports = airports ?? [];
-    updateAirportMarkers();
 }
 
 function updateAirportMarkers() {
-    if (!holidayMap || !loadedAirports || loadedAirports.length === 0) {
-        return;
-    }
-
     clearAirportMarkers();
 
     if (!selectedHolidayForAirportLayer) {
         return;
     }
 
-    if (holidayMap.getZoom() < AIRPORT_MIN_ZOOM) {
-        return;
-    }
-
-    if (!isSelectedHolidayCloseToCurrentMapView()) {
+    if (!loadedAirports || loadedAirports.length === 0) {
         return;
     }
 
@@ -139,23 +126,6 @@ function updateAirportMarkers() {
         airportMarkers.push(marker);
     });
 }
-
-function isSelectedHolidayCloseToCurrentMapView() {
-    if (!selectedHolidayForAirportLayer) {
-        return false;
-    }
-
-    const mapCenter = holidayMap.getCenter();
-
-    const distanceFromHolidayToMapCenterKm = calculateAirportDistanceKm(
-        selectedHolidayForAirportLayer.latitude,
-        selectedHolidayForAirportLayer.longitude,
-        mapCenter.lat,
-        mapCenter.lng);
-
-    return distanceFromHolidayToMapCenterKm <= ACTIVE_HOLIDAY_VIEW_RADIUS_KM;
-}
-
 function getNearestAirportsForSelectedHoliday() {
     if (!selectedHolidayForAirportLayer) {
         return [];
@@ -198,7 +168,7 @@ function getUniqueAirports(airports) {
 }
 
 function calculateAirportDistanceKm(latitude1, longitude1, latitude2, longitude2) {
-    const earthRadiusKm = 12371;
+    const earthRadiusKm = 6371;
 
     const dLat = toAirportRadians(latitude2 - latitude1);
     const dLon = toAirportRadians(longitude2 - longitude1);
@@ -231,6 +201,7 @@ function selectHolidayById(holidayId) {
 
     clearTravelRoute();
     clearAttractionMarkers();
+    clearAirportMarkers();
 
     showTravelRouteToHoliday(holiday);
 
